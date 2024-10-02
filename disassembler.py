@@ -6,7 +6,7 @@ from tkinter import filedialog, Scrollbar,\
 from capstone import *
 from capstone.x86 import *
 from eft import Theme
-import pefile, find_utils, threading
+import pefile, find_utils, threading, os
 from pygments.lexers import NasmLexer
 from pygments.token import Token
 from settings import Settings
@@ -160,7 +160,10 @@ class Disassembler:
         self.status_var.set(f"Disassembling... {min(progress, 100):.2f}% complete")
 
     def change_theme(self):
-        theme_path = filedialog.askopenfilename(title="Select .eft file", filetypes=[("EFT Files", "*.eft")])
+        themes_dir = os.path.join(os.getcwd(), "themes")
+        theme_path = filedialog.askopenfilename(title="Select theme file", 
+                                                filetypes=[("EFT Files", "*.eft")],
+                                                initialdir=themes_dir)
         if theme_path:
             self.theme = Theme.EFT_Theme(theme_path)
             self.update_ui_theme()
