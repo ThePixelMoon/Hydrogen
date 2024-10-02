@@ -176,6 +176,7 @@ class Disassembler:
         self.output_text.tag_configure('highlight', background=self.theme.get_property("highlight"))
         self.output_text.configure(bg=self.theme.get_property("output_color"))
         self.output_text.configure(fg=self.theme.get_property("output_text_color")) 
+        self.status_bar.configure(fg=self.theme.get_property("status_bar_text_color")) 
 
     def save_output(self, event=None):
         if self.is_disassembling:
