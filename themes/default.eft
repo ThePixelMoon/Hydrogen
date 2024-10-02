@@ -1,0 +1,13 @@
+- Default (Light)
+
+bg_color: "#f0f0f0" : String
+output_color: "#ffffff" : String
+status_bar_color: "#e0e0e0" : String
+
+function: "blue" : String
+builtin: "red" : String
+error: "orange" : String
+punctuation: "green" : String
+address: "lightgray" : String
+chunk: "lightgray" : String
+highlight: "cyan" : String
