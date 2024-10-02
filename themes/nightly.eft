@@ -13,4 +13,4 @@ error: "tomato" : String
 punctuation: "lightgreen" : String
 address: "lightgray" : String
 chunk: "lightgray" : String
-highlight: "yellow" : String
+highlight: "cyan" : String

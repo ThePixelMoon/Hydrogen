@@ -172,7 +172,7 @@ class Disassembler:
         self.output_text.configure(bg=self.theme.get_property("output_color"))
         self.output_text.configure(fg=self.theme.get_property("output_text_color")) 
 
-    def save_output(self):
+    def save_output(self, event=None):
         if self.is_disassembling:
             messagebox.showinfo("Info", "Please wait for the current disassembly to finish.")
             return
@@ -225,7 +225,7 @@ class Disassembler:
 
         self.output_text.tag_configure('chunk', font=("Courier New", self.font_size))
        
-    def open_file(self):
+    def open_file(self, event=None):
         if self.is_disassembling:
             messagebox.showinfo("Info", "Please wait for the current disassembly to finish.")
             return
@@ -249,11 +249,11 @@ class Disassembler:
             self.status_var.set(f"Error loading file: {e}")
             self.is_disassembling = False
 
-    def find_string(self):
+    def find_string(self, event=None):
         search_string = simpledialog.askstring("Find String", "Enter string to search:")
         find_utils.find_string(self.output_text, search_string)
 
-    def find_address(self):
+    def find_address(self, event=None):
         address = simpledialog.askstring("Find Address", "Enter address to find (in hex):")
         find_utils.find_address(self.output_text, address)
         

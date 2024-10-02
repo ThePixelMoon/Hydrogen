@@ -46,9 +46,8 @@ class Decompiler:
             parts = line.split(':')
             if len(parts) == 2:
                 address, instruction = parts
-                instruction = instruction.strip()
 
-                for instruction in instructions:
+                for instruction in instruction:
                     tokens = instruction.split()
                     match tokens[0]:
                         case "mov" if len(tokens) >= 3:
