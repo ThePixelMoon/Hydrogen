@@ -4,7 +4,7 @@ bg_color: "#13111b" : String
 output_color: "#191622" : String
 status_bar_color: "#15121e" : String
 output_text_color: "#e1e1e6" : String
-status_bar_text_color : "#000" : String
+status_bar_text_color : "#fff" : String
 scrollbar_color : "#fff" : String
 
 function: "#67e480" : String
