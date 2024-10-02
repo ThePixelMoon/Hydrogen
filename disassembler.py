@@ -10,6 +10,7 @@ import pefile, find_utils, threading
 from pygments.lexers import NasmLexer
 from pygments.token import Token
 from settings import Settings
+from decompiler import Decompiler
 
 class Disassembler:
     def __init__(self, master):
@@ -20,6 +21,7 @@ class Disassembler:
         self.master.title("Codename Hydrogen")
         self.master.geometry("600x400")
         self.master.configure(bg=self.theme.get_property("bg_color"))
+        self.decompiler = Decompiler(master)
                 
         self.font_size = 10
         self.min_font_size = 8
@@ -42,6 +44,7 @@ class Disassembler:
         self.output_text.configure(font=("Courier New", self.font_size))
 
         self.master.bind("<Control-MouseWheel>", self.resize_font)
+        self.master.bind("<Control-e>", self.decompile_code)
 
     def create_menu(self):
         self.menu_bar = Menu(self.master)
@@ -238,6 +241,7 @@ class Disassembler:
             self.is_disassembling = False
         except Exception as e:
             self.status_var.set(f"Error loading file: {e}")
+            self.is_disassembling = False
 
     def find_string(self):
         search_string = simpledialog.askstring("Find String", "Enter string to search:")
@@ -246,4 +250,17 @@ class Disassembler:
     def find_address(self):
         address = simpledialog.askstring("Find Address", "Enter address to find (in hex):")
         find_utils.find_address(self.output_text, address)
+        
+    # decomp
+    def decompile_code(self, event=None):
+        if not self.is_disassembling:
+            disassembled_code = self.output_text.get("1.0", tk.END).splitlines()
+            if disassembled_code:
+                self.decompiler.open_decompiler()
+                self.decompiler.decompile(disassembled_code)
+            else:
+                messagebox.showinfo("Info", "No disassembly to decompile.")
+        else:
+            messagebox.showinfo("Info", "Please wait for the current disassembly to finish.")
+
     
