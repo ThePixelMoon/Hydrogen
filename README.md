@@ -6,4 +6,4 @@ It's main purpose is to be compact, portable and minimalistic.
 ![Screenshot](assets/showcase.png?raw=true)
 
 ### CURRENTLY IN ALPHA!!! REPORT ANY BUGS AND/OR ISSUES IN THE ISSUES TAB!!!
-<small>*ps. themes are made using [EFT-py](https://github.com/PossiblePanda/EFT-py)*</small>
+*ps. themes are made using [EFT-py](https://github.com/PossiblePanda/EFT-py)*

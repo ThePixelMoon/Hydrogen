@@ -23,6 +23,7 @@ class Disassembler:
         self.master.geometry("600x400")
         self.master.configure(bg=self.theme.get_property("bg_color"))
         self.decompiler = Decompiler(master)
+        self.master.iconbitmap("assets/hydrogen.ico")
                 
         self.font_size = 10
         self.min_font_size = 8
