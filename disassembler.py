@@ -11,6 +11,7 @@ from pygments.lexers import NasmLexer
 from pygments.token import Token
 from settings import Settings
 from decompiler import Decompiler
+from plugin_manager import PluginManager
 
 class Disassembler:
     def __init__(self, master):
@@ -49,6 +50,10 @@ class Disassembler:
         self.master.bind("<Control-n>", self.save_output)
         self.master.bind("<Control-f>", self.find_string)
         self.master.bind("<Control-g>", self.find_address)
+        
+        # plugins
+        self.plugin_manager = PluginManager()
+        self.plugin_manager.load_plugins()
 
     def create_menu(self):
         self.menu_bar = Menu(self.master)
