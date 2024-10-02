@@ -4,6 +4,8 @@ bg_color: "#1e1e1e" : String
 output_color: "#282828" : String
 status_bar_color: "#333333" : String
 output_text_color: "#ffffff" : String
+status_bar_text_color : "#fff" : String
+scrollbar_color : "#fff" : String
 
 function: "lightblue" : String
 builtin: "lightcoral" : String

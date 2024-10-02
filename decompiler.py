@@ -48,130 +48,100 @@ class Decompiler:
                 address, instruction = parts
                 instruction = instruction.strip()
 
-                tokens = instruction.split()
-                if not tokens:
-                    continue
-
-                if "mov" in instruction:
-                    if len(tokens) >= 3:
-                        dest, src = tokens[1:3]
-                        c_code.append(f"{dest} = {src};")
-                elif "add" in instruction:
-                    if len(tokens) >= 3:
-                        dest, src = tokens[1:3]
-                        c_code.append(f"{dest} += {src};")
-                elif "sub" in instruction:
-                    if len(tokens) >= 3:
-                        dest, src = tokens[1:3]
-                        c_code.append(f"{dest} -= {src};")
-                elif "mul" in instruction:
-                    if len(tokens) >= 3:
-                        dest, src = tokens[1:3]
-                        c_code.append(f"{dest} *= {src};")
-                elif "div" in instruction:
-                    if len(tokens) >= 3:
-                        dest, src = tokens[1:3]
-                        c_code.append(f"{dest} /= {src};")
-                elif "jmp" in instruction:
-                    if len(tokens) >= 2:
-                        target = tokens[1]
-                        c_code.append(f"goto {target};")
-                elif "jz" in instruction:
-                    if len(tokens) >= 2:
-                        target = tokens[1]
-                        c_code.append(f"if (condition == 0) goto {target};")  
-                elif "jnz" in instruction:
-                    if len(tokens) >= 2:
-                        target = tokens[1]
-                        c_code.append(f"if (condition != 0) goto {target};")
-                elif "cmp" in instruction:
-                    if len(tokens) >= 3:
-                        dest, src = tokens[1:3]
-                        c_code.append(f"if ({dest} == {src}) {{ /* not implemented */ }}")
-                elif "call" in instruction:
-                    if len(tokens) >= 2:
-                        function_name = tokens[1]
-                        c_code.append(f"{function_name}();")
-                elif "and" in instruction:
-                    if len(tokens) >= 3:
-                        dest, src = tokens[1:3]
-                        c_code.append(f"{dest} &= {src};")
-                elif "or" in instruction:
-                    if len(tokens) >= 3:
-                        dest, src = tokens[1:3]
-                        c_code.append(f"{dest} |= {src};")
-                elif "xor" in instruction:
-                    if len(tokens) >= 3:
-                        dest, src = tokens[1:3]
-                        c_code.append(f"{dest} ^= {src};")
-                elif "push" in instruction:
-                    if len(tokens) >= 2:
-                        src = tokens[1]
-                        c_code.append(f"stack_push({src});")
-                elif "pop" in instruction:
-                    if len(tokens) >= 2:
-                        dest = tokens[1]
-                        c_code.append(f"{dest} = stack_pop();")
-                elif "ret" in instruction:
-                    c_code.append("return;")
-                elif "inc" in instruction:
-                    if len(tokens) >= 2:
-                        dest = tokens[1]
-                        c_code.append(f"{dest}++;")
-                elif "dec" in instruction:
-                    if len(tokens) >= 2:
-                        dest = tokens[1]
-                        c_code.append(f"{dest}--;")
-                elif "nop" in instruction:
-                    c_code.append("// No operation (ignored)")
-                elif "test" in instruction:
-                    if len(tokens) >= 3:
-                        dest, src = tokens[1:3]
-                        c_code.append(f"if ({dest} & {src}) {{ /* not implemented */ }}")
-                elif "shl" in instruction:
-                    if len(tokens) >= 3:
-                        dest, src = tokens[1:3]
-                        c_code.append(f"{dest} <<= {src};")
-                elif "shr" in instruction:
-                    if len(tokens) >= 3:
-                        dest, src = tokens[1:3]
-                        c_code.append(f"{dest} >>= {src};")
-                elif "not" in instruction:
-                    if len(tokens) >= 2:
-                        dest = tokens[1]
-                        c_code.append(f"{dest} = ~{dest};")
-                elif "jmpnz" in instruction:
-                    if len(tokens) >= 2:
-                        target = tokens[1]
-                        c_code.append(f"if (condition != 0) goto {target};")
-                elif "jmpz" in instruction:
-                    if len(tokens) >= 2:
-                        target = tokens[1]
-                        c_code.append(f"if (condition == 0) goto {target};")
-                elif "sete" in instruction:
-                    if len(tokens) >= 2:
-                        dest = tokens[1]
-                        c_code.append(f"{dest} = (condition == 0) ? 1 : 0;")
-                elif "setne" in instruction:
-                    if len(tokens) >= 2:
-                        dest = tokens[1]
-                        c_code.append(f"{dest} = (condition != 0) ? 1 : 0;")
-                elif "setg" in instruction:
-                    if len(tokens) >= 2:
-                        dest = tokens[1]
-                        c_code.append(f"{dest} = (condition > 0) ? 1 : 0;")
-                elif "setl" in instruction:
-                    if len(tokens) >= 2:
-                        dest = tokens[1]
-                        c_code.append(f"{dest} = (condition < 0) ? 1 : 0;")
-                elif "setge" in instruction:
-                    if len(tokens) >= 2:
-                        dest = tokens[1]
-                        c_code.append(f"{dest} = (condition >= 0) ? 1 : 0;")
-                elif "setle" in instruction:
-                    if len(tokens) >= 2:
-                        dest = tokens[1]
-                        c_code.append(f"{dest} = (condition <= 0) ? 1 : 0;")
+                for instruction in instructions:
+                    tokens = instruction.split()
+                    match tokens[0]:
+                        case "mov" if len(tokens) >= 3:
+                            dest, src = tokens[1:3]
+                            c_code.append(f"{dest} = {src};")
+                        case "add" if len(tokens) >= 3:
+                            dest, src = tokens[1:3]
+                            c_code.append(f"{dest} += {src};")
+                        case "sub" if len(tokens) >= 3:
+                            dest, src = tokens[1:3]
+                            c_code.append(f"{dest} -= {src};")
+                        case "mul" if len(tokens) >= 3:
+                            dest, src = tokens[1:3]
+                            c_code.append(f"{dest} *= {src};")
+                        case "div" if len(tokens) >= 3:
+                            dest, src = tokens[1:3]
+                            c_code.append(f"{dest} /= {src};")
+                        case "jmp" if len(tokens) >= 2:
+                            target = tokens[1]
+                            c_code.append(f"goto {target};")
+                        case "jz" if len(tokens) >= 2:
+                            target = tokens[1]
+                            c_code.append(f"if (condition == 0) goto {target};")  
+                        case "jnz" if len(tokens) >= 2:
+                            target = tokens[1]
+                            c_code.append(f"if (condition != 0) goto {target};")
+                        case "cmp" if len(tokens) >= 3:
+                            dest, src = tokens[1:3]
+                            c_code.append(f"if ({dest} == {src}) {{ /* not implemented */ }}")
+                        case "call" if len(tokens) >= 2:
+                            function_name = tokens[1]
+                            c_code.append(f"{function_name}();")
+                        case "and" if len(tokens) >= 3:
+                            dest, src = tokens[1:3]
+                            c_code.append(f"{dest} &= {src};")
+                        case "or" if len(tokens) >= 3:
+                            dest, src = tokens[1:3]
+                            c_code.append(f"{dest} |= {src};")
+                        case "xor" if len(tokens) >= 3:
+                            dest, src = tokens[1:3]
+                            c_code.append(f"{dest} ^= {src};")
+                        case "push" if len(tokens) >= 2:
+                            src = tokens[1]
+                            c_code.append(f"stack_push({src});")
+                        case "pop" if len(tokens) >= 2:
+                            dest = tokens[1]
+                            c_code.append(f"{dest} = stack_pop();")
+                        case "ret":
+                            c_code.append("return;")
+                        case "inc" if len(tokens) >= 2:
+                            dest = tokens[1]
+                            c_code.append(f"{dest}++;")
+                        case "dec" if len(tokens) >= 2:
+                            dest = tokens[1]
+                            c_code.append(f"{dest}--;")
+                        case "nop":
+                            c_code.append("// no operation")
+                        case "test" if len(tokens) >= 3:
+                            dest, src = tokens[1:3]
+                            c_code.append(f"if ({dest} & {src}) {{ /* not implemented */ }}")
+                        case "shl" if len(tokens) >= 3:
+                            dest, src = tokens[1:3]
+                            c_code.append(f"{dest} <<= {src};")
+                        case "shr" if len(tokens) >= 3:
+                            dest, src = tokens[1:3]
+                            c_code.append(f"{dest} >>= {src};")
+                        case "not" if len(tokens) >= 2:
+                            dest = tokens[1]
+                            c_code.append(f"{dest} = ~{dest};")
+                        case "jmpnz" if len(tokens) >= 2:
+                            target = tokens[1]
+                            c_code.append(f"if (condition != 0) goto {target};")
+                        case "jmpz" if len(tokens) >= 2:
+                            target = tokens[1]
+                            c_code.append(f"if (condition == 0) goto {target};")
+                        case "sete" if len(tokens) >= 2:
+                            dest = tokens[1]
+                            c_code.append(f"{dest} = (condition == 0) ? 1 : 0;")
+                        case "setne" if len(tokens) >= 2:
+                            dest = tokens[1]
+                            c_code.append(f"{dest} = (condition != 0) ? 1 : 0;")
+                        case "setg" if len(tokens) >= 2:
+                            dest = tokens[1]
+                            c_code.append(f"{dest} = (condition > 0) ? 1 : 0;")
+                        case "setl" if len(tokens) >= 2:
+                            dest = tokens[1]
+                            c_code.append(f"{dest} = (condition < 0) ? 1 : 0;")
+                        case "setge" if len(tokens) >= 2:
+                            dest = tokens[1]
+                            c_code.append(f"{dest} = (condition >= 0) ? 1 : 0;")
+                        case "setle" if len(tokens) >= 2:
+                            dest = tokens[1]
+                            c_code.append(f"{dest} = (condition <= 0) ? 1 : 0;")
 
             self.output_text.config(state=tk.NORMAL)
             self.output_text.delete(1.0, tk.END)

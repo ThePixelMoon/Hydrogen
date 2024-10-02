@@ -45,19 +45,23 @@ class Disassembler:
 
         self.master.bind("<Control-MouseWheel>", self.resize_font)
         self.master.bind("<Control-e>", self.decompile_code)
+        self.master.bind("<Control-q>", self.open_file)
+        self.master.bind("<Control-n>", self.save_output)
+        self.master.bind("<Control-f>", self.find_string)
+        self.master.bind("<Control-g>", self.find_address)
 
     def create_menu(self):
         self.menu_bar = Menu(self.master)
 
         file_menu = Menu(self.menu_bar, tearoff=0)
-        file_menu.add_command(label="Load", command=self.open_file)
-        file_menu.add_command(label="Save Output", command=self.save_output)
+        file_menu.add_command(label="Load (CTRL+Q)", command=self.open_file)
+        file_menu.add_command(label="Save Output (CTRL+N)", command=self.save_output)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.master.quit)
         
         find_menu = Menu(self.menu_bar, tearoff=0)
-        find_menu.add_command(label="Find String", command=self.find_string)
-        find_menu.add_command(label="Find Address", command=self.find_address)
+        find_menu.add_command(label="Find String (CTRL+F)", command=self.find_string)
+        find_menu.add_command(label="Find Address (CTRL+G)", command=self.find_address)
         
         help_menu = Menu(self.menu_bar, tearoff=0)
         help_menu.add_command(label="Change Theme", command=self.change_theme)
@@ -76,6 +80,7 @@ class Disassembler:
 
         self.scrollbar = Scrollbar(self.output_frame)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.scrollbar.configure(bg=self.theme.get_property("scrollbar_color")) 
 
         self.output_text = Text(self.output_frame, wrap=tk.WORD, width=80, height=20, yscrollcommand=self.scrollbar.set, bg="#ffffff", fg="#000000", font=("Courier New", self.font_size))
         self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -94,6 +99,7 @@ class Disassembler:
         self.status_var = tk.StringVar()
         self.status_bar = tk.Label(self.master, textvariable=self.status_var, bg=self.theme.get_property("status_bar_color"), anchor='w')
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+        self.status_bar.configure(fg=self.theme.get_property("status_bar_text_color")) 
 
         self.status_var.set("Ready")
 
