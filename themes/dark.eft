@@ -1,0 +1,14 @@
+- Dark
+
+bg_color: "#1e1e1e" : String
+output_color: "#282828" : String
+status_bar_color: "#333333" : String
+output_text_color: "#ffffff" : String
+
+function: "lightblue" : String
+builtin: "lightcoral" : String
+error: "tomato" : String
+punctuation: "lightgreen" : String
+address: "lightgray" : String
+chunk: "lightgray" : String
+highlight: "yellow" : String

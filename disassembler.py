@@ -9,10 +9,12 @@ from eft import Theme
 import pefile, find_utils, threading
 from pygments.lexers import NasmLexer
 from pygments.token import Token
+from settings import Settings
 
 class Disassembler:
     def __init__(self, master):
-        self.theme = Theme.EFT_Theme("themes/default.eft")
+        self.settings = Settings()
+        self.theme = Theme.EFT_Theme(self.settings.get_theme())
         
         self.master = master
         self.master.title("Codename Hydrogen")
@@ -54,8 +56,12 @@ class Disassembler:
         find_menu.add_command(label="Find String", command=self.find_string)
         find_menu.add_command(label="Find Address", command=self.find_address)
         
+        help_menu = Menu(self.menu_bar, tearoff=0)
+        help_menu.add_command(label="Change Theme", command=self.change_theme)
+        
         self.menu_bar.add_cascade(label="File", menu=file_menu)
         self.menu_bar.add_cascade(label="Find", menu=find_menu)
+        self.menu_bar.add_cascade(label="Help", menu=help_menu)
 
         self.master.config(menu=self.menu_bar)
 
@@ -68,7 +74,7 @@ class Disassembler:
 
         self.output_text = Text(self.output_frame, wrap=tk.WORD, width=80, height=20, yscrollcommand=self.scrollbar.set, bg="#ffffff", fg="#000000", font=("Courier New", self.font_size))
         self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.output_text.configure(state=tk.DISABLED, bg=self.theme.get_property("output_color"))
+        self.output_text.configure(state=tk.DISABLED, bg=self.theme.get_property("output_color"), fg=self.theme.get_property("output_text_color"))
 
         self.scrollbar.config(command=self.output_text.yview)
         
@@ -131,6 +137,25 @@ class Disassembler:
 
     def update_progress(self, progress):
         self.status_var.set(f"Disassembling... {min(progress, 100):.2f}% complete")
+
+    def change_theme(self):
+        theme_path = filedialog.askopenfilename(title="Select .eft file", filetypes=[("EFT Files", "*.eft")])
+        if theme_path:
+            self.theme = Theme.EFT_Theme(theme_path)
+            self.update_ui_theme()
+            self.settings.set_theme(theme_path)
+
+    def update_ui_theme(self):
+        self.master.configure(bg=self.theme.get_property("bg_color"))
+        self.output_text.tag_configure('function', foreground=self.theme.get_property("function"))
+        self.output_text.tag_configure('builtin', foreground=self.theme.get_property("builtin"))
+        self.output_text.tag_configure('error', foreground=self.theme.get_property("error"))
+        self.output_text.tag_configure('punctuation', foreground=self.theme.get_property("punctuation"))
+        self.output_text.tag_configure('address', foreground=self.theme.get_property("address"))
+        self.output_text.tag_configure('chunk', foreground=self.theme.get_property("chunk"))
+        self.output_text.tag_configure('highlight', background=self.theme.get_property("highlight"))
+        self.output_text.configure(bg=self.theme.get_property("output_color"))
+        self.output_text.configure(fg=self.theme.get_property("output_text_color")) 
 
     def save_output(self):
         if self.is_disassembling:
