@@ -1,0 +1,13 @@
+- Dark Mode
+
+bg_color: "#1e1e1e" : String          
+output_color: "#dcdcdc" : String      
+status_bar_color: "#2e2e2e" : String  
+
+function: "#569cd6" : String           
+builtin: "#ffcc00" : String            
+error: "#f44747" : String              
+punctuation: "#c678dd" : String        
+address: "#8b8b8b" : String            
+chunk: "#8b8b8b" : String              
+highlight: "#4ec9b0" : String          
