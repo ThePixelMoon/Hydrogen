@@ -52,7 +52,7 @@ class Disassembler:
         self.master.bind("<Control-g>", self.find_address)
         
         # plugins
-        self.plugin_manager = PluginManager()
+        self.plugin_manager = PluginManager(master)
         self.plugin_manager.load_plugins()
 
     def create_menu(self):

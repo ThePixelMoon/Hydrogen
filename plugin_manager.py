@@ -2,9 +2,12 @@
 
 import os
 import importlib
+from log import Log
 
 class PluginManager:
-    def __init__(self, plugin_dir="plugins"):
+    def __init__(self, main_window, plugin_dir="plugins"):
+        self.log = Log()
+        self.main_window = main_window 
         self.plugin_dir = plugin_dir
         self.plugins = []
 
@@ -15,13 +18,13 @@ class PluginManager:
                 try:
                     module = importlib.import_module(f"{self.plugin_dir}.{plugin_name}")
                     if hasattr(module, 'load'):
-                        module.load()
+                        module.load(self.main_window)
                         self.plugins.append(module)
-                        print(f"Plugin '{plugin_name}' loaded.")
+                        self.log.info(f"Plugin '{plugin_name}' loaded.")
                     else:
-                        print(f"Plugin '{plugin_name}' does not have a load() function.")
+                        self.log.info(f"Plugin '{plugin_name}' does not have a load(window) function.")
                 except Exception as e:
-                    print(f"Error loading plugin '{plugin_name}': {e}")
+                    self.log.info(f"Error loading plugin '{plugin_name}': {e}")
 
     def get_plugins(self):
         return self.plugins
