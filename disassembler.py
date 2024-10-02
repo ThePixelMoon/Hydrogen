@@ -58,6 +58,8 @@ class Disassembler:
         
         help_menu = Menu(self.menu_bar, tearoff=0)
         help_menu.add_command(label="Change Theme", command=self.change_theme)
+        file_menu.add_separator()
+        help_menu.add_command(label="About", command=self.about)
         
         self.menu_bar.add_cascade(label="File", menu=file_menu)
         self.menu_bar.add_cascade(label="Find", menu=find_menu)
@@ -80,6 +82,10 @@ class Disassembler:
         
         self.master.grid_rowconfigure(0, weight=1)
         self.master.grid_columnconfigure(0, weight=1)
+
+    def about(self):
+        messagebox.showinfo("Hydrogen", "Made with ♥ by YourLocalMoon")
+        return
 
     def create_status_bar(self):
         self.status_var = tk.StringVar()
