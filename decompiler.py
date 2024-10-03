@@ -151,6 +151,97 @@ class Decompiler:
                     case "setle" if len(tokens) >= 2:
                         dest = tokens[1]
                         c_code.append(f"{dest} = (condition <= 0) ? 1 : 0;")
+                    case "mulx" if len(tokens) >= 3:
+                        dest, src = tokens[1:3]
+                        c_code.append(f"{dest} *= {src};")
+                    case "divu" if len(tokens) >= 3:
+                        dest, src = tokens[1:3]
+                        c_code.append(f"{dest} = ({dest} / {src});")
+                    case "mod" if len(tokens) >= 3:
+                        dest, src = tokens[1:3]
+                        c_code.append(f"{dest} %= {src};")
+                    case "callx" if len(tokens) >= 2:
+                        function_name = tokens[1]
+                        params = ', '.join(tokens[2:])
+                        c_code.append(f"{function_name}({params});")
+                    case "nopx":
+                        c_code.append("// no operation")
+                    case "syscall" if len(tokens) >= 2:
+                        syscall_number = tokens[1]
+                        c_code.append(f"syscall({syscall_number});")
+                    case "wait" if len(tokens) >= 2:
+                        condition = tokens[1]
+                        c_code.append(f"while (!({condition})) {{}}")
+                    case "exit":
+                        c_code.append("exit(0);")
+                    case "jmpc" if len(tokens) >= 3:
+                        condition, target = tokens[1:3]
+                        c_code.append(f"if ({condition}) goto {target};")
+                    case "load" if len(tokens) >= 3:
+                        dest, address = tokens[1:3]
+                        c_code.append(f"{dest} = load_memory({address});")
+                    case "store" if len(tokens) >= 3:
+                        src, address = tokens[1:3]
+                        c_code.append(f"store_memory({address}, {src});")
+                    case "movzx" if len(tokens) >= 3:
+                        dest, src = tokens[1:3]
+                        c_code.append(f"{dest} = (unsigned int){src};")
+                    case "movsx" if len(tokens) >= 3:
+                        dest, src = tokens[1:3]
+                        c_code.append(f"{dest} = (int){src};")
+                    case "clc":
+                        c_code.append("carry_flag = 0;")
+                    case "stc":
+                        c_code.append("carry_flag = 1;")
+                    case "tst" if len(tokens) >= 2:
+                        src = tokens[1]
+                        c_code.append(f"if ({src}) {{}}")
+                    case "rol" if len(tokens) >= 3:
+                        dest, count = tokens[1:3]
+                        c_code.append(f"{dest} = ({dest} << {count}) | ({dest} >> (sizeof({dest}) * 8 - {count}));")
+                    case "ror" if len(tokens) >= 3:
+                        dest, count = tokens[1:3]
+                        c_code.append(f"{dest} = ({dest} >> {count}) | ({dest} << (sizeof({dest}) * 8 - {count}));")
+                    case "pushf":
+                        c_code.append("push_flags();")
+                    case "popf":
+                        c_code.append("pop_flags();")
+                    case "int" if len(tokens) >= 2:
+                        interrupt_number = tokens[1]
+                        c_code.append(f"interrupt({interrupt_number});")
+                    case "hlt":
+                        c_code.append("halt();")
+                    case "callr" if len(tokens) >= 2:
+                        label = tokens[1]
+                        c_code.append(f"goto {label};")
+                    case "rep" if len(tokens) >= 2:
+                        instruction = tokens[1]
+                        c_code.append(f"while (condition) {{ {instruction}; }}")
+                    case "int3":
+                        c_code.append("asm volatile(\"int $3\");")
+                    case "nop2":
+                        c_code.append("asm volatile(\"nop\");")
+                    case "jmpq" if len(tokens) >= 2:
+                        target = tokens[1]
+                        c_code.append(f"goto {target};")
+                    case "xchg" if len(tokens) >= 3:
+                        dest, src = tokens[1:3]
+                        c_code.append(f"{{ {dest} = {src}; {src} = {dest}; }}")
+                    case "incx" if len(tokens) >= 2:
+                        dest = tokens[1]
+                        c_code.append(f"{dest}++;")
+                    case "decx" if len(tokens) >= 2:
+                        dest = tokens[1]
+                        c_code.append(f"{dest}--;");
+                    case "lea" if len(tokens) >= 3:
+                        dest, src = tokens[1:3]
+                        c_code.append(f"{dest} = &{src};")
+                    case "shlx" if len(tokens) >= 3:
+                        dest, count = tokens[1:3]
+                        c_code.append(f"{dest} <<= {count};")
+                    case "shrx" if len(tokens) >= 3:
+                        dest, count = tokens[1:3]
+                        c_code.append(f"{dest} >>= {count};")
                     case _:
                         continue
 
