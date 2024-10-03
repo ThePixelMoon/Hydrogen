@@ -12,6 +12,7 @@ from pygments.token import Token
 from settings import Settings
 from decompiler import Decompiler
 from plugin_manager import PluginManager
+from utils import *
 
 class Disassembler:
     def __init__(self, master):
@@ -23,7 +24,12 @@ class Disassembler:
         self.master.geometry("600x400")
         self.master.configure(bg=self.theme.get_property("bg_color"))
         self.decompiler = Decompiler(master)
-        self.master.iconbitmap("assets/hydrogen.ico")
+        
+        if os.name == "nt":  # windows
+            self.master.iconbitmap("assets/hydrogen_light.ico")
+            utils.dark_title_bar(self.master)
+        else:
+            self.master.iconbitmap("assets/hydrogen.ico")
                 
         self.font_size = 10
         self.min_font_size = 8
@@ -70,7 +76,7 @@ class Disassembler:
         find_menu.add_command(label="Find Address (CTRL+G)", command=self.find_address)
         
         help_menu = Menu(self.menu_bar, tearoff=0)
-        help_menu.add_command(label="Change Theme", command=self.change_theme)
+        help_menu.add_command(label="Settings", command=self.open_settings)
         file_menu.add_separator()
         help_menu.add_command(label="About", command=self.about)
         
@@ -108,7 +114,10 @@ class Disassembler:
         self.status_bar.configure(fg=self.theme.get_property("status_bar_text_color")) 
 
         self.status_var.set("Ready")
-
+        
+    def open_settings(self):
+        self.settings.open_window(self.master, self)
+        
     def get_arch_and_mode(self, pe_file):
         if pe_file.FILE_HEADER.Machine == 0x8664:
             return CS_ARCH_X86, CS_MODE_64
@@ -158,29 +167,6 @@ class Disassembler:
 
     def update_progress(self, progress):
         self.status_var.set(f"Disassembling... {min(progress, 100):.2f}% complete")
-
-    def change_theme(self):
-        themes_dir = os.path.join(os.getcwd(), "themes")
-        theme_path = filedialog.askopenfilename(title="Select theme file", 
-                                                filetypes=[("EFT Files", "*.eft")],
-                                                initialdir=themes_dir)
-        if theme_path:
-            self.theme = Theme.EFT_Theme(theme_path)
-            self.update_ui_theme()
-            self.settings.set_theme(theme_path)
-
-    def update_ui_theme(self):
-        self.master.configure(bg=self.theme.get_property("bg_color"))
-        self.output_text.tag_configure('function', foreground=self.theme.get_property("function"))
-        self.output_text.tag_configure('builtin', foreground=self.theme.get_property("builtin"))
-        self.output_text.tag_configure('error', foreground=self.theme.get_property("error"))
-        self.output_text.tag_configure('punctuation', foreground=self.theme.get_property("punctuation"))
-        self.output_text.tag_configure('address', foreground=self.theme.get_property("address"))
-        self.output_text.tag_configure('chunk', foreground=self.theme.get_property("chunk"))
-        self.output_text.tag_configure('highlight', background=self.theme.get_property("highlight"))
-        self.output_text.configure(bg=self.theme.get_property("output_color"))
-        self.output_text.configure(fg=self.theme.get_property("output_text_color")) 
-        self.status_bar.configure(fg=self.theme.get_property("status_bar_text_color")) 
 
     def save_output(self, event=None):
         if self.is_disassembling:

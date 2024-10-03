@@ -3,6 +3,8 @@ import tkinter as tk
 from tkinter import Toplevel, Text, Scrollbar, Menu, filedialog, messagebox
 from eft import Theme
 from settings import Settings
+from utils import *
+import os
 
 class Decompiler:
     def __init__(self, master):
@@ -26,6 +28,12 @@ class Decompiler:
             self.scrollbar = Scrollbar(self.decompiler_window, command=self.output_text.yview)
             self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
             self.output_text.config(yscrollcommand=self.scrollbar.set)
+            
+            if os.name == "nt":  # windows
+                self.decompiler_window.iconbitmap("assets/hydrogen_light.ico")
+                utils.dark_title_bar(self.decompiler_window)
+            else:
+                self.decompiler_window.iconbitmap("assets/hydrogen.ico")
 
             self.create_menu()
 
