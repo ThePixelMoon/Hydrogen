@@ -41,7 +41,7 @@
     "text_files": "Fichiers texte",
     "all_files": "tout les fichiers",
     "error_loading_plugin": "Erreur chargement du plugin:",
-    "plugin_no_function": "n'a pas de fonction load(window.",
+    "plugin_no_function": "n'a pas de fonction load(window).",
     "plugin": "Plugin",
     "general": "Géneral",
     "theme": "Thème",
