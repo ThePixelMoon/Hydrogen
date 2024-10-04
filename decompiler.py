@@ -22,9 +22,19 @@ class Decompiler:
             self.decompiler_window.geometry("600x400")
             self.decompiler_window.configure(bg=self.theme.get_property("bg_color"))
 
+            self.bold = self.settings.get_bold_text()
+            self.italic = self.settings.get_italic_text()
+            
+            self.font_weight = "bold" if self.bold else "normal"
+            self.font_slant = "italic" if self.italic else "roman"
+
+            self.font_size = 10
+            self.min_font_size = 8
+            self.max_font_size = 30
+
             self.output_text = Text(self.decompiler_window, wrap=tk.WORD)
             self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-            self.output_text.configure(bg=self.theme.get_property("output_color"), fg=self.theme.get_property("output_text_color"))
+            self.output_text.configure(font=("Courier New", self.font_size, self.font_weight, self.font_slant), bg=self.theme.get_property("output_color"), fg=self.theme.get_property("output_text_color"))
             self.scrollbar = Scrollbar(self.decompiler_window, command=self.output_text.yview)
             self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
             self.output_text.config(yscrollcommand=self.scrollbar.set)
@@ -36,6 +46,16 @@ class Decompiler:
                 self.decompiler_window.iconbitmap("assets/hydrogen.ico")
 
             self.create_menu()
+            self.master.bind("<Control-MouseWheel>", self.resize_font)
+
+    def resize_font(self, event):
+        if event.delta > 0 and self.font_size < self.max_font_size:
+            self.font_size += 1
+        elif event.delta < 0 and self.font_size > self.min_font_size:
+            self.font_size -= 1
+        self.output_text.configure(font=("Courier New", self.font_size, self.font_weight, self.font_slant))
+
+        self.output_text.tag_configure('chunk', font=("Courier New", self.font_size, self.font_weight, self.font_slant))
 
     def create_menu(self):
         menu_bar = Menu(self.decompiler_window)

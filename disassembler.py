@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import filedialog, Scrollbar,\
                     Frame, Text, Menu, simpledialog,\
-                    messagebox
+                    messagebox, ttk
 from capstone import *
 from capstone.x86 import *
 from eft import Theme
@@ -13,7 +13,6 @@ from settings import Settings
 from decompiler import Decompiler
 from plugin_manager import PluginManager
 from utils import *
-
 class Disassembler:
     def __init__(self, master):
         self.settings = Settings()
@@ -35,6 +34,12 @@ class Disassembler:
         self.min_font_size = 8
         self.max_font_size = 30
         
+        self.bold = self.settings.get_bold_text()
+        self.italic = self.settings.get_italic_text()
+        
+        self.font_weight = "bold" if self.bold else "normal"
+        self.font_slant = "italic" if self.italic else "roman"
+
         self.is_disassembling = False
 
         self.create_menu()
@@ -49,7 +54,7 @@ class Disassembler:
         self.output_text.tag_configure('chunk', foreground=self.theme.get_property("chunk"))
         self.output_text.tag_configure('highlight', background=self.theme.get_property("highlight"))
 
-        self.output_text.configure(font=("Courier New", self.font_size))
+        self.output_text.configure(font=("Courier New", self.font_size, self.font_weight, self.font_slant))
 
         self.master.bind("<Control-MouseWheel>", self.resize_font)
         self.master.bind("<Control-e>", self.decompile_code)
@@ -57,6 +62,10 @@ class Disassembler:
         self.master.bind("<Control-n>", self.save_output)
         self.master.bind("<Control-f>", self.find_string)
         self.master.bind("<Control-g>", self.find_address)
+        
+        self.style = ttk.Style()
+        self.style.configure("Vertical.TScrollbar", background=self.theme.get_property("scrollbar_color"))
+        # ^ after a bit of research, i found out it will only work in linux :sob:
         
         # plugins
         self.plugin_manager = PluginManager(master)
@@ -90,9 +99,8 @@ class Disassembler:
         self.output_frame = Frame(self.master)
         self.output_frame.pack(padx=10, pady=(0, 10), fill=tk.BOTH, expand=True)
 
-        self.scrollbar = Scrollbar(self.output_frame)
+        self.scrollbar = ttk.Scrollbar(self.output_frame, orient='vertical')
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.scrollbar.configure(bg=self.theme.get_property("scrollbar_color")) 
 
         self.output_text = Text(self.output_frame, wrap=tk.WORD, width=80, height=20, yscrollcommand=self.scrollbar.set, bg="#ffffff", fg="#000000", font=("Courier New", self.font_size))
         self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -217,9 +225,13 @@ class Disassembler:
             self.font_size += 1
         elif event.delta < 0 and self.font_size > self.min_font_size:
             self.font_size -= 1
-        self.output_text.configure(font=("Courier New", self.font_size))
+            
+        self.font_weight = "bold" if self.bold else "normal"
+        self.font_slant = "italic" if self.italic else "roman"
 
-        self.output_text.tag_configure('chunk', font=("Courier New", self.font_size))
+        self.output_text.configure(font=("Courier New", self.font_size, self.font_weight, self.font_slant))
+
+        self.output_text.tag_configure('chunk', font=("Courier New", self.font_size, self.font_weight, self.font_slant))
        
     def open_file(self, event=None):
         if self.is_disassembling:
