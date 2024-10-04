@@ -5,8 +5,6 @@ from tkinter import messagebox
 def translate(self, key, translations):
     return translations.get(self.language, {}).get(key, key)
 
-# translate("no_disassembly", translations)
-
 def find_string(output_text, search_string, translations):
     if search_string:
         output = output_text.get("1.0", tk.END)

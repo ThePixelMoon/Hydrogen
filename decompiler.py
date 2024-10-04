@@ -32,7 +32,7 @@ class Decompiler:
             self.min_font_size = 8
             self.max_font_size = 30
             
-            self.language = "en" # default
+            self.language = self.settings.get_language()
             self.translations = self.load_translations()
 
             self.output_text = Text(self.decompiler_window, wrap=tk.WORD)

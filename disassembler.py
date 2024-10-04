@@ -31,7 +31,7 @@ class Disassembler:
         else:
             self.master.iconbitmap("assets/hydrogen.ico")
                 
-        self.language = "en" # default
+        self.language = self.settings.get_language()
         self.translations = self.load_translations()
                 
         self.font_size = 10

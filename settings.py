@@ -1,6 +1,5 @@
 #- settings.py -#
-import json
-import os
+import json, os, sys
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from tkinter import ttk
@@ -139,9 +138,12 @@ class Settings:
         self.restart_application()
         
     def restart_application(self):
-        import sys
-        import os
         os.execl(sys.executable, sys.executable, *sys.argv)
+
+    def get_languages(self):
+        translations_dir = 'translations/'
+        languages = [f[:-5] for f in os.listdir(translations_dir) if f.endswith('.json')]
+        return languages
 
     def create_general_tab(self, frame, object):
         frame.configure(bg=self.theme.get_property("bg_color"))
@@ -149,11 +151,12 @@ class Settings:
         language_label = tk.Label(frame, text=self.translate("language"), bg=self.theme.get_property("bg_color"), fg=self.theme.get_property("output_text_color"))
         language_label.pack(anchor='w', padx=10, pady=5)
 
-        self.language_combobox = ttk.Combobox(frame, values=["en", "ru"], state="readonly")
-        self.language_combobox.set(self.get_language())
+        self.language_var = tk.StringVar(value=self.get_language())
+        self.language_combobox = ttk.Combobox(frame, textvariable=self.language_var, values=self.get_languages(), state="readonly")
+        self.language_combobox.set(self.language_var.get())
         self.language_combobox.pack(anchor='w', padx=10, pady=5)
         self.language_combobox.bind("<<ComboboxSelected>>", self.on_language_change)
-
+        
         font_size_label = tk.Label(frame, text="Font Size:", bg=self.theme.get_property("bg_color"), fg=self.theme.get_property("output_text_color"))
         font_size_label.pack(anchor='w', padx=10, pady=5)
 
