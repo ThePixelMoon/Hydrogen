@@ -1,0 +1,16 @@
+- Combine Sandbox theme aka banana theme
+
+bg_color: "#fff7b3" : String
+output_color: "#fff9d6" : String
+status_bar_color: "#ffe680" : String
+output_text_color: "#5c3b00" : String
+status_bar_text_color: "#5c3b00" : String
+scrollbar_color: "#ffed99" : String
+
+function: "#f7c700" : String
+builtin: "#e6a200" : String
+error: "#ffcc00" : String
+punctuation: "#8d6b00" : String
+address: "#ffe680" : String
+chunk: "#ffe680" : String
+highlight: "#faffb0" : String
