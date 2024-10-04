@@ -1,7 +1,6 @@
 #- plugin_manager.py -#
 
-import os
-import importlib
+import os, importlib, json
 from log import Log
 
 class PluginManager:
@@ -10,6 +9,8 @@ class PluginManager:
         self.main_window = main_window 
         self.plugin_dir = plugin_dir
         self.plugins = []
+        self.language = "en" # default
+        self.translations = self.load_translations()
 
     def load_plugins(self):
         for filename in os.listdir(self.plugin_dir):
@@ -20,11 +21,21 @@ class PluginManager:
                     if hasattr(module, 'load'):
                         module.load(self.main_window)
                         self.plugins.append(module)
-                        self.log.info(f"Plugin '{plugin_name}' loaded.")
+                        self.log.info(f"{self.translate("plugin")} '{plugin_name}' {self.translate("loaded")}")
                     else:
-                        self.log.info(f"Plugin '{plugin_name}' does not have a load(window) function.")
+                        self.log.info(f"{self.translate("plugin")} '{plugin_name}' {self.translate("plugin_no_function")}")
                 except Exception as e:
-                    self.log.info(f"Error loading plugin '{plugin_name}': {e}")
+                    self.log.info(f"{self.translate("error_loading_plugin")} '{plugin_name}': {e}")
+
+    def load_translations(self):
+        try:
+            with open(f"translations/{self.language}.json", "r", encoding='utf-8') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            return {}
+
+    def translate(self, key):
+        return self.translations.get(self.language, {}).get(key, key)
 
     def get_plugins(self):
         return self.plugins

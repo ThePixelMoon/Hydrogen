@@ -4,7 +4,7 @@ from tkinter import Toplevel, Text, Scrollbar, Menu, filedialog, messagebox
 from eft import Theme
 from settings import Settings
 from utils import *
-import os
+import os, json
 
 class Decompiler:
     def __init__(self, master):
@@ -31,6 +31,9 @@ class Decompiler:
             self.font_size = 10
             self.min_font_size = 8
             self.max_font_size = 30
+            
+            self.language = "en" # default
+            self.translations = self.load_translations()
 
             self.output_text = Text(self.decompiler_window, wrap=tk.WORD)
             self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -48,6 +51,16 @@ class Decompiler:
             self.create_menu()
             self.master.bind("<Control-MouseWheel>", self.resize_font)
 
+    def load_translations(self):
+        try:
+            with open(f"translations/{self.language}.json", "r", encoding='utf-8') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            return {}
+
+    def translate(self, key):
+        return self.translations.get(self.language, {}).get(key, key)
+
     def resize_font(self, event):
         if event.delta > 0 and self.font_size < self.max_font_size:
             self.font_size += 1
@@ -60,10 +73,10 @@ class Decompiler:
     def create_menu(self):
         menu_bar = Menu(self.decompiler_window)
         file_menu = Menu(menu_bar, tearoff=0)
-        file_menu.add_command(label="Save Output", command=self.save_output)
+        file_menu.add_command(label=self.translate("save_output"), command=self.save_output)
         file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.decompiler_window.destroy)
-        menu_bar.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label=self.translate("exit"), command=self.decompiler_window.destroy)
+        menu_bar.add_cascade(label=self.translate("file"), menu=file_menu)
         self.decompiler_window.config(menu=menu_bar)
 
     def decompile(self, disassembly):
@@ -106,7 +119,7 @@ class Decompiler:
                         c_code.append(f"if (condition != 0) goto {target};")
                     case "cmp" if len(tokens) >= 3:
                         dest, src = tokens[1:3]
-                        c_code.append(f"if ({dest} == {src}) {{ /* not implemented */ }}")
+                        c_code.append(f"if ({dest} == {src}) {{ /* {self.translate("not_implemented")} */ }}")
                     case "call" if len(tokens) >= 2:
                         function_name = tokens[1]
                         c_code.append(f"{function_name}();")
@@ -134,10 +147,10 @@ class Decompiler:
                         dest = tokens[1]
                         c_code.append(f"{dest}--;")
                     case "nop":
-                        c_code.append("// no operation")
+                        c_code.append(f"// {self.translate("no_operation")}")
                     case "test" if len(tokens) >= 3:
                         dest, src = tokens[1:3]
-                        c_code.append(f"if ({dest} & {src}) {{ /* not implemented */ }}")
+                        c_code.append(f"if ({dest} & {src}) {{ /* {self.translate("not_implemented")} */ }}")
                     case "shl" if len(tokens) >= 3:
                         dest, src = tokens[1:3]
                         c_code.append(f"{dest} <<= {src};")
@@ -273,8 +286,8 @@ class Decompiler:
     def save_output(self):
         file_path = filedialog.asksaveasfilename(
             defaultextension=".txt", 
-            filetypes=[("Text files", "*.txt"), ("All files", "*.*")],
-            title="Save Output"
+            filetypes=[(self.translate("text_files"), "*.txt"), (self.translate("all_files"), "*.*")],
+            title=self.translate("save_output")
         )
         
         if file_path:
@@ -282,6 +295,6 @@ class Decompiler:
                 with open(file_path, 'w') as file:
                     output = self.output_text.get("1.0", tk.END)
                     file.write(output)
-                messagebox.showinfo("Success", f"Output saved to {file_path}.")
+                messagebox.showinfo(self.translate("success"), f"{self.translate("output_saved")} {file_path}.")
             except Exception as e:
-                messagebox.showerror("Error", f"Failed to save output: {str(e)}")
+                messagebox.showerror(self.translate("error"), f"{self.translate("failed_output")} {str(e)}")

@@ -2,7 +2,12 @@
 import tkinter as tk
 from tkinter import messagebox
 
-def find_string(output_text, search_string):
+def translate(self, key, translations):
+    return translations.get(self.language, {}).get(key, key)
+
+# translate("no_disassembly", translations)
+
+def find_string(output_text, search_string, translations):
     if search_string:
         output = output_text.get("1.0", tk.END)
         if search_string in output:
@@ -14,11 +19,11 @@ def find_string(output_text, search_string):
             output_text.tag_remove("highlight", "1.0", "end")
             output_text.tag_add("highlight", f"{start_line}.{start_column}", f"{start_line}.{end_index}")
             output_text.see(f"{start_line}.{start_column}")
-            messagebox.showinfo("Search Result", f"Found '{search_string}' at line {start_line}.")
+            messagebox.showinfo(translate("search_result", translations), f"{translate("found", translations)} '{search_string}' {translate("at_line", translations)} {start_line}.")
         else:
-            messagebox.showinfo("Search Result", f"'{search_string}' not found.")
+            messagebox.showinfo(translate("search_result", translations), f"'{search_string}' {translate("not_found", translations)}")
 
-def find_address(output_text, address):
+def find_address(output_text, address, translations):
     if address:
         try:
             address = int(address, 16)
@@ -32,9 +37,9 @@ def find_address(output_text, address):
                     output_text.see(f"{line_number}.0")
 
                     output_text.tag_add("highlight", f"{line_number}.0", f"{line_number}.end")
-                    messagebox.showinfo("Search Result", f"Found at line {line_number}: {line.strip()}")
+                    messagebox.showinfo(translate("search_result", translations), f"{translate("found", translations)} {translate("at_line", translations)} {line_number}: {line.strip()}")
                     return
 
-            messagebox.showinfo("Search Result", f"Address '{address:x}' not found.")
+            messagebox.showinfo(translate("search_result", translations), f"{translate("address", translations)} '{address:x}' {translate("not_found", translations)}")
         except ValueError:
-            messagebox.showerror("Error", "Invalid address format. Please enter a hex address.")
+            messagebox.showerror(translate("error", translations), translate("hex_error", translations))

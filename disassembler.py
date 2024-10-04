@@ -6,13 +6,14 @@ from tkinter import filedialog, Scrollbar,\
 from capstone import *
 from capstone.x86 import *
 from eft import Theme
-import pefile, find_utils, threading, os
+import pefile, find_utils, threading, os, json
 from pygments.lexers import NasmLexer
 from pygments.token import Token
 from settings import Settings
 from decompiler import Decompiler
 from plugin_manager import PluginManager
 from utils import *
+
 class Disassembler:
     def __init__(self, master):
         self.settings = Settings()
@@ -29,6 +30,9 @@ class Disassembler:
             utils.dark_title_bar(self.master)
         else:
             self.master.iconbitmap("assets/hydrogen.ico")
+                
+        self.language = "en" # default
+        self.translations = self.load_translations()
                 
         self.font_size = 10
         self.min_font_size = 8
@@ -71,27 +75,37 @@ class Disassembler:
         self.plugin_manager = PluginManager(master)
         self.plugin_manager.load_plugins()
 
+    def load_translations(self):
+        try:
+            with open(f"translations/{self.language}.json", "r", encoding='utf-8') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            return {}
+
+    def translate(self, key):
+        return self.translations.get(self.language, {}).get(key, key)
+
     def create_menu(self):
         self.menu_bar = Menu(self.master)
 
         file_menu = Menu(self.menu_bar, tearoff=0)
-        file_menu.add_command(label="Load (CTRL+Q)", command=self.open_file)
-        file_menu.add_command(label="Save Output (CTRL+N)", command=self.save_output)
+        file_menu.add_command(label=self.translate("load_file"), command=self.open_file)
+        file_menu.add_command(label=self.translate("save_output"), command=self.save_output)
         file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.master.quit)
+        file_menu.add_command(label=self.translate("exit"), command=self.master.quit)
         
         find_menu = Menu(self.menu_bar, tearoff=0)
-        find_menu.add_command(label="Find String (CTRL+F)", command=self.find_string)
-        find_menu.add_command(label="Find Address (CTRL+G)", command=self.find_address)
+        find_menu.add_command(label=self.translate("find_string"), command=self.find_string)
+        find_menu.add_command(label=self.translate("find_address"), command=self.find_address)
         
         help_menu = Menu(self.menu_bar, tearoff=0)
-        help_menu.add_command(label="Settings", command=self.open_settings)
+        help_menu.add_command(label=self.translate("settings"), command=self.open_settings)
         file_menu.add_separator()
-        help_menu.add_command(label="About", command=self.about)
+        help_menu.add_command(label=self.translate("about"), command=self.about)
         
-        self.menu_bar.add_cascade(label="File", menu=file_menu)
-        self.menu_bar.add_cascade(label="Find", menu=find_menu)
-        self.menu_bar.add_cascade(label="Help", menu=help_menu)
+        self.menu_bar.add_cascade(label=self.translate("file"), menu=file_menu)
+        self.menu_bar.add_cascade(label=self.translate("find"), menu=find_menu)
+        self.menu_bar.add_cascade(label=self.translate("help"), menu=help_menu)
 
         self.master.config(menu=self.menu_bar)
 
@@ -112,7 +126,7 @@ class Disassembler:
         self.master.grid_columnconfigure(0, weight=1)
 
     def about(self):
-        messagebox.showinfo("Hydrogen", "Made with ♥ by YourLocalMoon")
+        messagebox.showinfo("Codename Hydrogen", self.translate("about_message"))
         return
 
     def create_status_bar(self):
@@ -121,7 +135,7 @@ class Disassembler:
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
         self.status_bar.configure(fg=self.theme.get_property("status_bar_text_color")) 
 
-        self.status_var.set("Ready")
+        self.status_var.set(self.translate("ready"))
         
     def open_settings(self):
         self.settings.open_window(self.master, self)
@@ -147,7 +161,7 @@ class Disassembler:
 
     def fine_disassemble(self, file=None, arch=None, mode=None):
         if file is None:
-            messagebox.showinfo("Error", "BETCH PROVIDE A FILE!!")
+            messagebox.showinfo(self.translate("error"), self.translate("provide_file_error"))
             return
         
         main_code = self.get_main_code_section(file.sections, file.OPTIONAL_HEADER.BaseOfCode)
@@ -174,18 +188,18 @@ class Disassembler:
         return disassembly_output
 
     def update_progress(self, progress):
-        self.status_var.set(f"Disassembling... {min(progress, 100):.2f}% complete")
+        self.status_var.set(f"{self.translate("disassembling")} {min(progress, 100):.2f}% {self.translate("complete")}")
 
     def save_output(self, event=None):
         if self.is_disassembling:
-            messagebox.showinfo("Info", "Please wait for the current disassembly to finish.")
+            messagebox.showinfo(self.translate("info"), self.translate("wait_disassembly"))
             return
         
         file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt")])
         if file_path:
             with open(file_path, 'w') as f:
                 f.write(self.output_text.get("1.0", tk.END))
-            self.status_var.set(f"Saved output to: {file_path}")
+            self.status_var.set(f"{self.translate("output_save")} {file_path}")
 
     def highlight_code(self, code, chunk_size=20):
         lines = code.splitlines()
@@ -235,12 +249,12 @@ class Disassembler:
        
     def open_file(self, event=None):
         if self.is_disassembling:
-            messagebox.showinfo("Info", "Please wait for the current disassembly to finish.")
+            messagebox.showinfo(self.translate("info"), self.translate("wait_disassembly"))
             return
         
-        file_path = filedialog.askopenfilename(filetypes=[("Executable and DLL Files", "*.exe *.dll")])
+        file_path = filedialog.askopenfilename(filetypes=[(self.translate("binary"), "*.exe *.dll")])
         if file_path:
-            self.status_var.set(f"Loading: {file_path}")
+            self.status_var.set(f"{self.translate("loading")} {file_path}")
             threading.Thread(target=self.disassemble_in_background, args=(file_path,)).start()
 
     def disassemble_in_background(self, file_path):
@@ -251,19 +265,19 @@ class Disassembler:
             disassembly = self.fine_disassemble(exe, arch, mode)
             disassembly_output = "\n".join(disassembly)
             self.highlight_code(disassembly_output)
-            self.status_var.set(f"Loaded: {file_path}")
+            self.status_var.set(f"{self.translate("loaded")} {file_path}")
             self.is_disassembling = False
         except Exception as e:
-            self.status_var.set(f"Error loading file: {e}")
+            self.status_var.set(f"{self.translate("error_loading_file")} {e}")
             self.is_disassembling = False
 
     def find_string(self, event=None):
-        search_string = simpledialog.askstring("Find String", "Enter string to search:")
-        find_utils.find_string(self.output_text, search_string)
+        search_string = simpledialog.askstring(self.translate("find_string"), self.translate("find_string_text"))
+        find_utils.find_string(self.output_text, search_string, self.translations)
 
     def find_address(self, event=None):
-        address = simpledialog.askstring("Find Address", "Enter address to find (in hex):")
-        find_utils.find_address(self.output_text, address)
+        address = simpledialog.askstring(self.translate("find_address"), self.translate("find_address_text"))
+        find_utils.find_address(self.output_text, address, self.translations)
         
     # decomp
     def decompile_code(self, event=None):
@@ -273,8 +287,8 @@ class Disassembler:
                 self.decompiler.open_decompiler()
                 self.decompiler.decompile(disassembled_code)
             else:
-                messagebox.showinfo("Info", "No disassembly to decompile.")
+                messagebox.showinfo(self.translate("info"), self.translate("no_disassembly"))
         else:
-            messagebox.showinfo("Info", "Please wait for the current disassembly to finish.")
+            messagebox.showinfo(self.translate("info"), self.translate("wait_disassembly"))
 
     
