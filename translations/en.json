@@ -12,7 +12,7 @@
     "error": "Error",
     "disassembling": "Disassembling... ",
     "complete": "complete",
-    "provide_file_error": "BETCH PROVIDE A FILE!!",
+    "provide_file_error": "Please provide a file.",
     "info": "Info",
     "wait_disassembly": "Please wait for the current disassembly to finish.",
     "loading_file": "Loading:",
